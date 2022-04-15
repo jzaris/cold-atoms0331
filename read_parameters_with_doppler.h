@@ -26,6 +26,7 @@ struct CARandCtx {
 GLOBALS_EXT double dt_global;
 GLOBALS_EXT double duration_global;
 GLOBALS_EXT double steps_global;
+GLOBALS_EXT double write_per_global;
 GLOBALS_EXT int particles_global;
 GLOBALS_EXT double Bz_global;
 GLOBALS_EXT double kz_global;

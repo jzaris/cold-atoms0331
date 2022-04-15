@@ -49,6 +49,7 @@ void initialize(const char *filename){
 	double dt_arr[1]; /*timestep*/
 	double duration_arr[1]; /*simulation duration*/
 	double steps_arr[1]; /*number of timesteps*/
+	double write_per_arr[1]; /*rate at which values are written to output file*/
 	double Bz_arr[1]; /*axial magnetic field*/
 	double kz_arr[1]; /*stiffness parameter*/
 	double delta_arr[1]; /*relative strength between rot. wall and trap potentials*/
@@ -57,6 +58,7 @@ void initialize(const char *filename){
         double dt;
 	double duration;	
 	double steps;
+	double write_per;
 	double Bz;
 	double kz;
 	double delta;
@@ -66,7 +68,7 @@ void initialize(const char *filename){
 	/*int steps;*/
 
 
-	while (line_num<16){
+	while (line_num<17){
 		if (line_num==0){
 			printf("%s", line);
 			str_to_double(x, line, num_particles);  /*x-coordinates*/
@@ -165,6 +167,16 @@ void initialize(const char *filename){
 		}
 
 		if (line_num==11){
+                         getline(&line, &len, f); 
+                         printf("%s", line);
+                         str_to_double(write_per_arr, line, 1);
+                         write_per = write_per_arr[0];
+                         printf("%f ", write_per);
+                         printf("\n");
+                }
+
+
+		if (line_num==12){
                          getline(&line, &len, f);  /*axial magnetic field*/
                          printf("%s", line);
                          str_to_double(Bz_arr, line, 1);
@@ -173,7 +185,7 @@ void initialize(const char *filename){
                          printf("\n");
                 }
 
-                if (line_num==12){
+                if (line_num==13){
                          getline(&line, &len, f);  /*kz*/
                          printf("%s", line);
                          str_to_double(kz_arr, line, 1);
@@ -182,7 +194,7 @@ void initialize(const char *filename){
                          printf("\n");
                 }
 
-		if (line_num==13){
+		if (line_num==14){
                          getline(&line, &len, f);  /*delta*/
                          printf("%s", line);
                          str_to_double(delta_arr, line, 1);
@@ -191,7 +203,7 @@ void initialize(const char *filename){
                          printf("\n");
                 }
 
-		if (line_num==14){
+		if (line_num==15){
                          getline(&line, &len, f);  /*omegaR*/
                          printf("%s", line);
                          str_to_double(omegaR_arr, line, 1);
@@ -200,7 +212,7 @@ void initialize(const char *filename){
                          printf("\n");
                 }
 
-		if (line_num==15){
+		if (line_num==16){
                          getline(&line, &len, f);  /*phi0*/
                          printf("%s", line);
                          str_to_double(phi0_arr, line, 1);
@@ -253,6 +265,7 @@ void initialize(const char *filename){
 	dt_global = dt;
         duration_global = duration;
         steps_global = steps;
+	write_per_global = write_per;
         particles_global = num_particles;
         Bz_global = Bz;
         kz_global = kz;
@@ -429,6 +442,8 @@ void initialize(const char *filename){
         }*/
 
 	seed_global = dist(gen);
+
+	seed_global = 123456;
 	cout<<"SEED: " << seed_global<< "\n";
 	ctx_global = ca_rand_create();
 	ca_rand_seed(ctx_global, seed_global);
