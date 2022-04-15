@@ -38,6 +38,7 @@ int main(int argc, char *argv[]){
                 ca_rand_seed(ctx_test[i], seeds_global(i,0));
         }*/
 	cout << "SEED accessed from bend_kick_c_with_doppler.c: " << seed_global << "\n";
+	//cout << "skip" << int(skip_global) << "\n";
 
 	int num_particles = particles_global;
 	int num_beams = beams_global;
@@ -48,6 +49,8 @@ int main(int argc, char *argv[]){
 	outfile << " ";
 	outfile << std::scientific << steps_global;
 	outfile << " ";
+	outfile << std::scientific << write_per_global;
+        outfile << " ";
 	outfile << std::scientific << duration_global;
 	outfile << " ";
 	outfile << std::scientific <<  dt_global;
@@ -82,8 +85,8 @@ int main(int argc, char *argv[]){
 	write_beam_params();
 	
 	auto start = high_resolution_clock::now();
-	//run_trap_potential(kz_global); //run simulation, writing pos. and vel. to output file at each timestep
-	run_doppler_only();
+	run_trap_potential(kz_global); //run simulation, writing pos. and vel. to output file at each timestep
+	//run_doppler_only();
 	auto stop = high_resolution_clock::now();
 	auto duration = duration_cast<microseconds>(stop-start);
         cout << "Time to run simulation: " << duration.count() << endl;
@@ -147,10 +150,13 @@ void run_trap_potential(double kz){
 	double this_mass;
         cout << "k_z: " << kz << "\n";
         cout << "charges" << arr(6,0) << " " << arr(6,1) << " " << arr(6,2) << " " << arr(6,3) << "\n"; 	
+	write_to_outfile();
 	ca_bend_kick_update_vector(0.5*dt_global); //evolve half timestep
-        write_to_outfile();
+        //write_to_outfile(); OLD WRITE
+	int this_step = 1;
 
         for(int i = 0; i< steps_global-1; i++){
+		cout << i << " ";
 		trap_force(kz); //update forces array due to momentum kick from trap force in time dt_global
 		rotating_wall_force(); //update forces array due to rotating wall force
 		coulomb_force(); //update forces array due to coulomb force
@@ -161,11 +167,21 @@ void run_trap_potential(double kz){
 			arr(4,i) += forces(1,i) / this_mass;  //update y velocity
 			arr(5,i) += forces(2,i) / this_mass;  //update z velocity
 		}
-                ca_bend_kick_update_vector(dt_global);  //update positions and velocities due to axial field
+                //ca_bend_kick_update_vector(dt_global);  //update positions and velocities due to axial field
+		ca_bend_kick_update_vector(0.5*dt_global);
+		if (this_step % int(write_per_global) == 0){
+                      write_to_outfile();
+                }
+		ca_bend_kick_update_vector(0.5*dt_global);
+
 		reset_forces(); //set all forces to zero
 
-                //cout << "Particle 1 x-coord: " << arr(0,0) << "\n";
-		write_to_outfile();
+                //cout << "Particle 1 x-coord: " << arr(0,0) << "\n"; OLD WRITE
+		//if (this_step % int(write_per_global) == 0){  OLD WRITE
+		//	write_to_outfile(); OLD WRITE
+		//} OLD WRITE
+		this_step += 1;
+		//cout << this_step % int(skip_global) << " ";
         }
 
 	trap_force(kz); //update forces
@@ -391,7 +407,11 @@ double gaussian_intensity(int beam, int ion){
         double xperp[3];
         double khat[3];
         double kmag = sqrt(arr_beams(1,beam)*arr_beams(1,beam)+arr_beams(2,beam)*arr_beams(2,beam)+arr_beams(3,beam)*arr_beams(3,beam));
-        for(int m = 0; m<3; m++){
+        if(arr_beams(4,beam) < 0){
+		//cout << "inten" << arr_beams(0,beam);
+		return arr_beams(0,beam);
+	}	
+	for(int m = 0; m<3; m++){
                 khat[m] = arr_beams(m+1,beam)/kmag;
         }
         for(int m = 0; m<3; m++){
@@ -451,9 +471,9 @@ static void add_radiation_pressure_small_n(int beam, int ion,
         double recoil[3] = { 0.0 };
         int l, j;
         if (0 == n) return;
-
+	cout << "photon absorbed" << "\n";
         ca_rand_gaussian(ctx, n, 0.0, 1.0, &directions[0][0]);
-
+	//cout << " " << directions[0][0] << " ";
 
         ca_rand_gaussian(ctx, n, 0.0, 1.0, &directions[1][0]);
         ca_rand_gaussian(ctx, n, 0.0, 1.0, &directions[2][0]);
