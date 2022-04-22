@@ -276,7 +276,6 @@ void initialize(const char *filename){
 	//gamma0_global = 2.0 * M_PI * 18*pow(10,6);
 	hbar_global = 1.054571817*pow(10,-34);
 
-
 	//initialize forces array with all zeros
 	forces.Initialize(3, num_particles);
 	for(int i = 0; i<3; i++){

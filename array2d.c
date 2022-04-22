@@ -1,5 +1,5 @@
 #include "array2d.h"
-#include "read_parameters.h"
+//#include "read_parameters.h"
 //#include <fstream>
 //#include <iostream>
 
