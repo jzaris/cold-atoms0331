@@ -274,7 +274,7 @@ void initialize(const char *filename){
         phi0_global = phi0;
         phi_global = phi0;
 	//gamma0_global = 2.0 * M_PI * 18*pow(10,6);
-	hbar_global = 1.0*pow(10,-34);
+	hbar_global = 1.054571817*pow(10,-34);
 
 
 	//initialize forces array with all zeros

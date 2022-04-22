@@ -498,7 +498,7 @@ static void add_radiation_pressure_small_n(int beam, int ion,
                 recoil[l] *= hbar_k_nrm;
         }
         for (l = 0; l < 3; ++l) {
-                forces(l,ion) += n * hbar_global*arr_beams(l+1, beam) + recoil[l];
+		forces(l,ion) += n * hbar_global*arr_beams(l+1, beam) + recoil[l];
         }
 }
 
